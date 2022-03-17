@@ -1,5 +1,4 @@
 package com.example.demo;
-
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -82,11 +81,16 @@ void reactive_filtrarJugadoresMayoresA34() {
     void reactive_filtrasRankingNacionalidad() {
         List<Player> list = CsvUtilFile.getPlayers();
         Flux<Player> listFlux = Flux.fromStream(list.parallelStream()).cache();
-        listFlux
+        Mono<Map<String, Collection<Player>>> listFilter =
+                listFlux
                 .sort((player1, player2) -> Math.max(player1.winners, player2.winners))
                 .distinct()
                 .collectMultimap(Player::getNational);
-      //  System.out.println(listFlux.block().size());
+
+        //Imprime de mayor a menor el país con más partidos ganados (nacionalidad)
+        listFilter.block().forEach((key, values) -> System.out.println(key));
+        assert listFilter.block().size() == 164;
+        System.out.println(listFilter.block().size());
 
     }
 
