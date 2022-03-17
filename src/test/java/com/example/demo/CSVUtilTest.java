@@ -55,6 +55,7 @@ public class CSVUtilTest {
                 .collectMultimap(Player::getClub);
 
         assert listFilter.block().size() == 322;
+
     }
 
 //Filrta los jugadores mayores a 34 reactor
@@ -62,10 +63,16 @@ public class CSVUtilTest {
 void reactive_filtrarJugadoresMayoresA34() {
     List<Player> list = CsvUtilFile.getPlayers();
     Flux<Player> listFlux = Flux.fromStream(list.parallelStream()).cache();
-    Mono<Map<String, Collection<Player>>> listFilter = listFlux
-            .filter(player -> player.age > 34 && player.club.equals("FC Schalke 04"))
+    Mono<Map<Integer, Collection<Player>>> listFilter = listFlux
+            .filter(player -> player.age >= 34 && player.club.equals("Juventus"))
             .distinct()
-            .collectMultimap(Player::getClub);
+            .collectMultimap(Player::getAge);
+    //Solo tiene un jugador que tiene >= 34 años y juega en la Juve
+    assert listFilter.block().size() == 1;
+
+
+    System.out.println(listFilter.block().size());
+
 
 }
 
@@ -79,6 +86,8 @@ void reactive_filtrarJugadoresMayoresA34() {
                 .sort((player1, player2) -> Math.max(player1.winners, player2.winners))
                 .distinct()
                 .collectMultimap(Player::getNational);
+      //  System.out.println(listFlux.block().size());
+
     }
 
 
